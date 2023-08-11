@@ -3,10 +3,6 @@
 import sys
 
 if __name__ == '__main__':
-    total_sum = 0
-
-    # Skip the first argument since it's the script name
-    for arg in sys.argv[1:]:
-        total_sum += int(arg)
-
+    arguments = sys.argv[1:]  # Exclude the script name
+    total_sum = sum(int(arg) for arg in arguments)
     print(total_sum)
