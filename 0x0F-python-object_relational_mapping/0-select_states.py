@@ -1,21 +1,31 @@
-def list_all():
-    '''list all states in db'''
+#!/usr/bin/python3
+"""lists all states from the database hbtn_0e_0_usa"""
+
+import sys
+import MySQLdb
+
+if __name__ == "__main__":
+    """
+    Connects to a MySQL server
+
+    Args:
+    - sys.argv[1]: MySQL username
+    - sys.argv[2]: MySQL password
+    - sys.argv[3]: Name of the database containing the states table
+    """
     username = sys.argv[1]
     password = sys.argv[2]
-    db_name = sys.argv[3]
-    host = 'localhost'
-    port = 3306
-    db = MySQLdb.connect(host=host, user=username, passwd=password,
-                         db=db_name, port=port)
-    cur = db.cursor()
-    cur.execute('SELECT * FROM states ORDER BY id ASC;')
-    result = cur.fetchall()
-    cur.close()
+    database_name = sys.argv[3]
+
+    db = MySQLdb.connect(host="localhost", port=3306, user=username,
+                         passwd=password, db=database_name)
+
+    cursor = db.cursor()
+
+    cursor.execute("SELECT * FROM states ORDER BY id ASC")
+
+    rows = cursor.fetchall()
+    for r in rows:
+        print(r)
+
     db.close()
-    if result:
-        for row in result:
-            print(row)
-
-
-if __name__ == '__main__':
-    list_all()
