@@ -1,32 +1,36 @@
 #!/usr/bin/python3
+""" deletes all State objects with a name containing the letter a
+    from the database hbtn_0e_6_usa
+"""
 
-"""
-Module to perfom simple queries on the model_state model
-using and ORM - SQLAlchemy
-"""
+import sys
 from model_state import Base, State
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-import sys
-
-
-def connect_and_query(user: str, passwd: str, dbase: str) -> None:
-
-    """
-    Connect to the database and make queries using ORM
-    """
-    try:
-        engine = create_engine('mysql+mysqldb://{}:{}@localhost/{}'
-                               .format(user, passwd, dbase))
-        Session = sessionmaker(bind=engine)
-        session = Session()
-        states = session.query(State).filter(State.name.like('%a%')).all()
-        [session.delete(state) for state in states]
-        session.commit()
-
-    except Exception as e:
-        return e
-
 
 if __name__ == "__main__":
-    connect_and_query(sys.argv[1], sys.argv[2], sys.argv[3])
+    """
+    Connects to a MySQL server
+
+    Args:
+    - sys.argv[1]: MySQL username
+    - sys.argv[2]: MySQL password
+    - sys.argv[3]: Name of the database containing the states table
+    """
+    username = sys.argv[1]
+    password = sys.argv[2]
+    database_name = sys.argv[3]
+
+    engine = create_engine("mysql+mysqldb://{}:{}@localhost:3306/{}"
+                           .format(username, password, database_name))
+
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    states = session.query(State).filter(State.name.contains('a'))
+    if states is not None:
+        for s in states:
+            session.delete(s)
+    session.commit()
+
+    session.close()

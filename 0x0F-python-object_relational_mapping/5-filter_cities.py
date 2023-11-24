@@ -1,37 +1,37 @@
 #!/usr/bin/python3
+""" takes in the name of a state as an argument and lists
+all cities of that state, using the database hbtn_0e_4_usa"""
 
-"""
-Lists all cities from the cities table of database hbtn_0e_0_usa.
-Usage: ./5-filter_cities.py <username> <password> <database-name>
-<state>
-"""
 import sys
-import MySQLdb as db
-
-
-def connect_and_query() -> None:
-
-    """Connect to the database and execute query"""
-    try:
-        cnx = db.connect(user=sys.argv[1], passwd=sys.argv[2], db=sys.argv[3])
-        cursor = cnx.cursor(cursorclass=db.cursors.Cursor)
-        cursor.execute('SELECT city.name, state.name\
-                        FROM cities as city\
-                        INNER JOIN states as state\
-                        ON city.state_id = state.id\
-                        ORDER BY city.id ASC;')
-        cities = cursor.fetchall()
-        cities_list = []
-        for city in cities:
-            if city[1] == sys.argv[4]:
-                cities_list.append(city[0])
-        print(", ".join(list(dict.fromkeys((cities_list)))))
-
-        cursor.close()
-        cnx.close()
-    except Exception as e:
-        return (e)
-
+import MySQLdb
 
 if __name__ == "__main__":
-    connect_and_query()
+    """
+    Connects to a MySQL server
+
+    Args:
+    - sys.argv[1]: MySQL username
+    - sys.argv[2]: MySQL password
+    - sys.argv[3]: Name of the database containing the states table
+    - sys.argv[4]: Name of the state to search for cities
+    """
+    username = sys.argv[1]
+    password = sys.argv[2]
+    database_name = sys.argv[3]
+    state_name = sys.argv[4]
+
+    db = MySQLdb.connect(host="localhost", port=3306, user=username,
+                         passwd=password, db=database_name)
+
+    cursor = db.cursor()
+
+    cursor.execute("SELECT cities.name FROM cities "
+                   "INNER JOIN states ON cities.state_id "
+                   "= states.id WHERE states.name = %s "
+                   "ORDER BY cities.id ASC", (state_name,))
+
+    rows = cursor.fetchall()
+    city = [r[0] for r in rows]
+    print(', '.join(city))
+
+    db.close()
