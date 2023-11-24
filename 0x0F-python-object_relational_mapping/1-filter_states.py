@@ -1,30 +1,33 @@
 #!/usr/bin/python3
+"""lists all states with a name starting with "N" from
+ the database hbtn_0e_0_usa"""
 
-"""
-Lists all states from the states table of database hbtn_0e_0_usa.
-Usage: ./0-select_states.py <username> \
-                            <password> \
-                             <database-name>
-"""
 import sys
-import MySQLdb as db
-
-
-def connect_and_query() -> None:
-
-    """Connect to the database and execute query"""
-    try:
-        cnx = db.connect(user=sys.argv[1], passwd=sys.argv[2], db=sys.argv[3])
-        cursor = cnx.cursor(cursorclass=db.cursors.Cursor)
-        cursor.execute('SELECT * FROM states ORDER BY `id` ASC;')
-        states = cursor.fetchall()
-
-        for state in states:
-            if state[1][0] == "N":
-                print(state)
-    except Exception as e:
-        return (e)
-
+import MySQLdb
 
 if __name__ == "__main__":
-    connect_and_query()
+    """
+    Connects to a MySQL server
+
+    Args:
+    - sys.argv[1]: MySQL username
+    - sys.argv[2]: MySQL password
+    - sys.argv[3]: Name of the database containing the states table
+    """
+    username = sys.argv[1]
+    password = sys.argv[2]
+    database_name = sys.argv[3]
+
+    db = MySQLdb.connect(host="localhost", port=3306, user=username,
+                         passwd=password, db=database_name)
+
+    cursor = db.cursor()
+
+    cursor.execute("SELECT * FROM states WHERE name LIKE BINARY "
+                   "'N%' ORDER BY states.id ASC")
+
+    rows = cursor.fetchall()
+    for r in rows:
+        print(r)
+
+    db.close()
